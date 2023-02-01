@@ -1,5 +1,5 @@
 import { Cube, Face } from '../types';
-import { adjacentFacesMap } from '../variables';
+import { adjacentFacesMap, oposingFacesMap } from '../variables';
 import { rotateMatrixClockwise, rotateMatrixCounterClockwise, rotateMatrixNTimes } from './matrix';
 
 type RotateCubeProps = {
@@ -17,12 +17,24 @@ export const rotateCube = ({
 }: RotateCubeProps): Cube => {
   const newCube: Cube = { ...previousCube };
 
+  const cubeSideLength = newCube.up.length;
+
   // Rotate face
   if (depth === 0) {
     if (rotation === 'clockwise') {
       newCube[face] = rotateMatrixClockwise(previousCube[face]);
     } else {
       newCube[face] = rotateMatrixCounterClockwise(previousCube[face]);
+    }
+  }
+
+  if (depth === cubeSideLength - 1) {
+    const oposingFace = oposingFacesMap[face];
+
+    if (rotation === 'clockwise') {
+      newCube[oposingFace] = rotateMatrixCounterClockwise(previousCube[oposingFace]);
+    } else {
+      newCube[oposingFace] = rotateMatrixClockwise(previousCube[oposingFace]);
     }
   }
 
@@ -55,8 +67,6 @@ export const rotateCube = ({
 
     newCube[receiverFace.face] = rerotatedReceiverFace;
   });
-
-  console.log(newCube);
 
   return newCube;
 };

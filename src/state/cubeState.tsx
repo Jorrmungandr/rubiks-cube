@@ -22,7 +22,12 @@ export function CubeProvider({ children, dimensions }: CubeProviderProps) {
       {
         depth: 0,
         face: 'up',
-        rotation: 'counterclockwise',
+        rotation: 'clockwise',
+      },
+      {
+        depth: 2,
+        face: 'right',
+        rotation: 'clockwise',
       },
     ];
 
