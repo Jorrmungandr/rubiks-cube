@@ -1,6 +1,4 @@
-import { Cube, Face, Matrix } from "../types";
-import { adjacentFacesMap } from "../variables";
-import { rotateMatrixNTimes } from "./matrix";
+import { Cube, CuboidInfo, Face } from '../types';
 
 type GetCuboidsFromCubeStateProps = {
   cube: Cube;
@@ -8,10 +6,7 @@ type GetCuboidsFromCubeStateProps = {
 
 export const getCuboidsFromCubeState = ({
   cube,
-}: GetCuboidsFromCubeStateProps): {
-  position: [number, number, number];
-  colorIndexes: number[];
-}[] => {
+}: GetCuboidsFromCubeStateProps): CuboidInfo[] => {
   const cubeSideLength = cube.up.length;
 
   const getAxisIntersection = ({
