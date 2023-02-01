@@ -17,6 +17,7 @@
 	},
 	"plugins": [
 		"react",
+		"plugin:import/errors",
 		"@typescript-eslint"
 	],
 	"settings": {
@@ -28,7 +29,13 @@
 					".ts",
 					".tsx"
 				]
-			}
+			},
+			"alias": {
+        "map": [
+          ["@/", "./src"]
+        ],
+        "extensions": [".ts", ".js", ".jsx", ".json"]
+      }
 		}
 	},
 	"rules": {
@@ -52,6 +59,10 @@
 					".jsx"
 				]
 			}
-		]
+		],
+		"react/no-unknown-property": "off",
+		"indent": "off",
+		"react/jsx-indent": "off",
+		"no-tabs": "off"
 	}
 }

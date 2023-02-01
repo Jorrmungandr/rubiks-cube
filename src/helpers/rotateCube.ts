@@ -35,7 +35,9 @@ export const rotateCube = ({
       receiverFace.rotation,
     );
 
-    const senderFace = faceRotations.at(index - 1);
+    const senderIndex = rotation === 'clockwise' ? index - 1 : (index + 1) % faceRotations.length;
+
+    const senderFace = faceRotations.at(senderIndex);
 
     if (!senderFace) return;
 
@@ -53,6 +55,8 @@ export const rotateCube = ({
 
     newCube[receiverFace.face] = rerotatedReceiverFace;
   });
+
+  console.log(newCube);
 
   return newCube;
 };

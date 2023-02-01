@@ -33,8 +33,8 @@ export const adjacentFacesMap: Record<Face, { face: Face, rotation: number }[]> 
   ],
   back: [
     { face: 'down', rotation: 2 },
-    { face: 'right', rotation: 1 },
+    { face: 'right', rotation: -1 },
     { face: 'up', rotation: 0 },
-    { face: 'left', rotation: -1 },
+    { face: 'left', rotation: 1 },
   ],
 };

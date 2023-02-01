@@ -9,14 +9,14 @@ export const assembleInitialCube = ({
 }: AssembleInitialCubeProps): Cube => {
   const initialCube: Cube = {
     up: [],
-    down: [],
-    front: [],
-    back: [],
-    right: [],
     left: [],
+    front: [],
+    right: [],
+    down: [],
+    back: [],
   };
 
-  const faces: Face[] = ['right', 'left', 'up', 'down', 'front', 'back'];
+  const faces: Face[] = ['up', 'left', 'front', 'right', 'down', 'back'];
 
   faces.forEach((face, index) => {
     const lineContent = Array.from(Array(dimensions[1])).map(() => index);

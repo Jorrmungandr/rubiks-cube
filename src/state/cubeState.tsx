@@ -2,11 +2,11 @@ import React, {
   createContext, useContext, useMemo, useState,
 } from 'react';
 import { assembleInitialCube, rotateCube } from '../helpers';
-import { Cube } from '../types';
+import { Cube, Face } from '../types';
 
-const CubeContext = createContext<{ cube: Cube | null; handleRotation:() => void }>({
+const CubeContext = createContext<{ cube: Cube | null; handleRotation: () => void }>({
   cube: null,
-  handleRotation: () => {},
+  handleRotation: () => { },
 });
 
 type CubeProviderProps = {
@@ -18,12 +18,20 @@ export function CubeProvider({ children, dimensions }: CubeProviderProps) {
   const [cube, setCube] = useState<Cube>(assembleInitialCube({ dimensions }));
 
   const handleRotation = () => {
-    const rotatedCube = rotateCube({
-      previousCube: cube,
-      depth: 0,
-      face: 'right',
-      rotation: 'clockwise',
-    });
+    const instructions: { depth: number; face: Face; rotation: 'clockwise' | 'counterclockwise' }[] = [
+      {
+        depth: 0,
+        face: 'up',
+        rotation: 'counterclockwise',
+      },
+    ];
+
+    const rotatedCube = instructions.reduce((prevCube, currentInstruction) => {
+      return rotateCube({
+        previousCube: prevCube,
+        ...currentInstruction,
+      });
+    }, cube);
 
     setCube(rotatedCube);
   };
@@ -32,6 +40,7 @@ export function CubeProvider({ children, dimensions }: CubeProviderProps) {
     () => ({
       cube,
       handleRotation,
+      dimensions,
     }),
     [cube],
   );

@@ -14,7 +14,7 @@ export const rotateMatrixCounterClockwise = (originalMatrix: Matrix): Matrix => 
   return rotatedMatrix;
 };
 
-export const rotateMatrixNTimes = (originalMatrix: Matrix, times): Matrix => {
+export const rotateMatrixNTimes = (originalMatrix: Matrix, times: number): Matrix => {
   let rotatingMatrix = [...originalMatrix];
 
   if (times === 0) return rotatingMatrix;
