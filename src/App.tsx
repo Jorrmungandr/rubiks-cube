@@ -1,14 +1,18 @@
 import { ChakraProvider } from '@chakra-ui/react';
 
 import { MainCubeView } from './pages';
-import { CubeProvider } from './state';
+import { ConfigProvider, CubeProvider, InstructionQueueProvider } from './state';
 
 function App() {
   return (
     <ChakraProvider>
-      <CubeProvider dimensions={[3, 3]}>
-        <MainCubeView />
-      </CubeProvider>
+      <ConfigProvider>
+        <CubeProvider>
+          <InstructionQueueProvider>
+            <MainCubeView />
+          </InstructionQueueProvider>
+        </CubeProvider>
+      </ConfigProvider>
     </ChakraProvider>
   );
 }

@@ -2,50 +2,43 @@ import React, {
   createContext, useContext, useMemo, useState,
 } from 'react';
 import { assembleInitialCube, rotateCube } from '../helpers';
-import { Cube, Face } from '../types';
+import { Cube, Instruction } from '../types';
+import { useConfig } from './configState';
 
-const CubeContext = createContext<{ cube: Cube | null; handleRotation: () => void }>({
+const CubeContext = createContext<{
+  cube: Cube | null;
+  handleRotation: (instructions: Instruction[]) => void;
+}>({
   cube: null,
   handleRotation: () => { },
 });
 
 type CubeProviderProps = {
   children: React.ReactNode;
-  dimensions: [number, number];
 };
 
-export function CubeProvider({ children, dimensions }: CubeProviderProps) {
-  const [cube, setCube] = useState<Cube>(assembleInitialCube({ dimensions }));
+export function CubeProvider({ children }: CubeProviderProps) {
+  const { config } = useConfig();
 
-  const handleRotation = () => {
-    const instructions: { depth: number; face: Face; rotation: 'clockwise' | 'counterclockwise' }[] = [
-      {
-        depth: 0,
-        face: 'up',
-        rotation: 'clockwise',
-      },
-      {
-        depth: 2,
-        face: 'right',
-        rotation: 'clockwise',
-      },
-    ];
+  const [cube, setCube] = useState<Cube>(assembleInitialCube({ dimensions: config.dimensions }));
 
-    const rotatedCube = instructions.reduce((prevCube, currentInstruction) => {
-      return rotateCube({
-        previousCube: prevCube,
-        ...currentInstruction,
-      });
-    }, cube);
+  const handleRotation = (instructions: Instruction[]) => {
+    setCube((previousCube) => {
+      const rotatedCube = instructions.reduce((prevCube, currentInstruction) => {
+        return rotateCube({
+          previousCube: prevCube,
+          ...currentInstruction,
+        });
+      }, previousCube);
 
-    setCube(rotatedCube);
+      return rotatedCube;
+    });
   };
 
   const contextValue = useMemo(
     () => ({
       cube,
       handleRotation,
-      dimensions,
     }),
     [cube],
   );

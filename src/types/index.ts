@@ -10,3 +10,11 @@ export type CuboidInfo = {
   position: [number, number, number];
   colorIndexes: number[];
 };
+
+export type Axis = 'x' | 'y' | 'z';
+
+export type Instruction = {
+  depth: number;
+  face: Face;
+  rotation: 'clockwise' | 'counterclockwise';
+}

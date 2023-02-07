@@ -1,38 +1,96 @@
 import { useFrame } from '@react-three/fiber';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Mesh } from 'three';
+import { useConfig } from '../../../../state';
+import { Axis } from '../../../../types';
 import { faceColors } from '../../../../variables';
 
 type CuboidProps = {
   position: [number, number, number];
   colorIndexes: number[];
+  animation?: {
+    angle: number;
+    duration: number;
+    axis: Axis;
+    axisPosition: 'start' | 'end';
+    rotation: 'clockwise' | 'counterclockwise';
+  };
 };
 
-export function Cuboid({ position, colorIndexes }: CuboidProps) {
+export function Cuboid({ position, colorIndexes, animation }: CuboidProps) {
   const mesh = useRef<Mesh>(null!);
+  const startingTimeRef = useRef<number | null>(null);
+  const hasEndedAnimation = useRef<boolean>(true);
+
+  const axes: Axis[] = ['x', 'y', 'z'];
+  const translationAxes = axes.filter((axis) => axis !== animation?.axis);
+  const translationAxesIndexes = translationAxes.map((axis) => axes.indexOf(axis));
 
   useFrame(({ clock }) => {
-    const elapsedTime = clock.getElapsedTime();
-    const speedMultiplier = 1;
+    if (!animation) return;
+    if (hasEndedAnimation.current) return;
 
-    if (elapsedTime > (Math.PI * 2) / speedMultiplier) return;
+    const currentElapsedTime = clock.getElapsedTime();
 
-    const distance = Math.sqrt(position[1] ** 2 + position[2] ** 2);
+    if (startingTimeRef.current === null) {
+      startingTimeRef.current = currentElapsedTime;
+    }
 
-    mesh.current.rotation.x = elapsedTime * speedMultiplier;
+    const elapsedTime = currentElapsedTime - startingTimeRef.current;
 
-    const cuboidAngleInRadians = Math.atan2(position[2], position[1]);
+    const {
+      angle,
+      duration,
+      axis: rotationAxis,
+      axisPosition: rotationAxisPosition,
+      rotation,
+    } = animation;
 
-    mesh.current.position.y = Math.cos((elapsedTime + cuboidAngleInRadians) * speedMultiplier) * distance;
-    mesh.current.position.z = Math.sin((elapsedTime + cuboidAngleInRadians) * speedMultiplier) * distance;
+    const multiplicationFactor = angle / (duration / 1000);
+
+    const currentAngle = elapsedTime * multiplicationFactor;
+
+    if (currentAngle > angle) {
+      startingTimeRef.current = null;
+      hasEndedAnimation.current = true;
+    }
+
+    const orderedIndexes = rotation === 'clockwise' ? [1, 0] : [0, 1];
+    const axisPositionInvertedIndexes = rotationAxisPosition === 'start' ? orderedIndexes.reverse() : orderedIndexes;
+    const yAxisInvertedPosition = rotationAxis === 'y' ? axisPositionInvertedIndexes.reverse() : axisPositionInvertedIndexes;
+
+    const [aIndex, bIndex] = yAxisInvertedPosition;
+
+    const aPosition = position[translationAxesIndexes[aIndex]];
+    const bPosition = position[translationAxesIndexes[bIndex]];
+
+    const distance = Math.sqrt(aPosition ** 2 + bPosition ** 2);
+
+    const rotationInverter = rotation === 'clockwise' ? 1 : -1;
+    const axisPositionInverter = rotationAxisPosition === 'start' ? 1 : -1;
+
+    mesh.current.rotation[rotationAxis] = currentAngle * rotationInverter * axisPositionInverter;
+
+    const cuboidAngleInRadians = Math.atan2(bPosition, aPosition);
+
+    mesh.current.position[translationAxes[aIndex]] = Math.cos(currentAngle + cuboidAngleInRadians) * distance;
+    mesh.current.position[translationAxes[bIndex]] = Math.sin(currentAngle + cuboidAngleInRadians) * distance;
   });
+
+  useEffect(() => {
+    hasEndedAnimation.current = false;
+  }, [JSON.stringify(animation)]);
 
   return (
     <mesh ref={mesh} position={position}>
       <boxGeometry args={[1, 1, 1]} />
-      {colorIndexes.map((colorIndex, index) => (
-        <meshBasicMaterial attach={`material-${index}`} color={faceColors[colorIndex] || '#000000'} />
-      ))}
+      {colorIndexes.map((colorIndex, index) => {
+        const color = faceColors[colorIndex] || '#000000';
+
+        return (
+          <meshBasicMaterial key={`${color}-${index}`} attach={`material-${index}`} color={color} />
+        );
+      })}
     </mesh>
   );
 }

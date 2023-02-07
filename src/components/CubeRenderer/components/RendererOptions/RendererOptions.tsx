@@ -6,7 +6,7 @@ export function RendererOptions() {
       <CameraControls />
       <Stats />
       <ambientLight />
-      <axesHelper args={[5]} />
+      {/* <axesHelper args={[5]} /> */}
     </>
   );
 }
